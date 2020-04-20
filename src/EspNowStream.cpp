@@ -97,12 +97,14 @@ size_t EspNowStreamClass::readBytes(char *buffer, size_t length) {
 }
 
 size_t EspNowStreamClass::write(uint8_t data) {
+#ifdef AUTO_FLUSH_TIME
+  os_timer_disarm(&_flush_timer);
+#endif
   _tx_buf[_tx_buf_len++] = data;
   if (_tx_buf_len >= TX_BUF_SIZE)
     flush();
 #ifdef AUTO_FLUSH_TIME
   if (_tx_buf_len) {
-    os_timer_disarm(&_flush_timer);
     os_timer_arm(&_flush_timer, AUTO_FLUSH_TIME, false);
   }
 #endif
